@@ -1,9 +1,9 @@
 // Offline support: the app shell is served from cache (refreshed in the background);
 // reading libraries from the CDN are cached the first time they are used.
-const SHELL = "recipebox-shell-v1";
+const SHELL = "recipebox-shell-v2";
 const LIBS = "recipebox-libs-v1";
 const FILES = ["./", "index.html", "style.css", "parser.js", "store.js", "app.js", "manifest.webmanifest",
-  "icon.svg", "icon-180.png", "icon-192.png", "icon-512.png"];
+  "icon.svg", "fonts/kalidoscope-regular.woff2", "fonts/kalidoscope-medium.woff2", "fonts/kalidoscope-bold.woff2", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SHELL).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
