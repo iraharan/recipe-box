@@ -379,9 +379,21 @@
       .filter((s) => !s.startsWith("Microsoft") && !s.includes("Normal.dot") && !/^[A-Z_\d ]+$/.test(s)).join("\n");
   }
 
+  // Consistent Title Case for recipe titles: "CHICKEN DRY DISH" / "rogan josh" -> "Chicken Dry Dish" / "Rogan Josh".
+  // Small joining words stay lowercase except at the start ("Rice with Peas").
+  const SMALL_WORDS = new Set(["a", "an", "and", "or", "of", "the", "in", "on", "with", "for", "to", "n", "at", "by"]);
+  function titleCase(t) {
+    return String(t || "").trim().replace(/\s+/g, " ").split(" ").map((w, i) =>
+      w.split(/([-\/])/).map((p, j) => {
+        const lower = p.toLowerCase();
+        if ((i > 0 || j > 0) && SMALL_WORDS.has(lower)) return lower;
+        return lower.replace(/\p{L}/u, (c) => c.toUpperCase());
+      }).join("")).join(" ");
+  }
+
   const api = {
     canonical, isStaple, haveMatches, rank, parseIngredient, startsWithQuantity, hasUnit,
-    parseRecipe, minutes, looksLikeIngredient, guessDiet, guessMethod, isCollection, parseCollection, docText,
+    parseRecipe, minutes, looksLikeIngredient, guessDiet, guessMethod, isCollection, parseCollection, docText, titleCase,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.RB = Object.assign(root.RB || {}, api);

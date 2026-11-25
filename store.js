@@ -43,13 +43,22 @@
     get: (id) => tx("readonly", (s) => req(s.get(Number(id)))),
     async put(r) {
       r.updatedAt = Date.now();
+      if (r.title && r.status !== STATUS.PROCESSING) r.title = RB.titleCase(r.title);
       const id = await tx("readwrite", (s) => req(s.put(r)));
       changed();
       return id;
     },
     async putMany(list) {
+      for (const r of list) if (r.title) r.title = RB.titleCase(r.title);
       await tx("readwrite", (s) => Promise.all(list.map((r) => req(s.put(r)))));
       changed();
+    },
+    /** One-off tidy-up: gives every saved title the same Title Case. */
+    async tidyTitles() {
+      const all = await tx("readonly", (s) => req(s.getAll()));
+      const changedOnes = all.filter((r) => r.title && r.status !== STATUS.PROCESSING && RB.titleCase(r.title) !== r.title);
+      if (changedOnes.length) await this.putMany(changedOnes);
+      return changedOnes.length;
     },
     async remove(id) { await tx("readwrite", (s) => req(s.delete(Number(id)))); changed(); },
   };

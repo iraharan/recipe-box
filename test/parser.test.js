@@ -63,3 +63,11 @@ test("your collections parse", () => {
     assert.ok(drafts.every((d) => d.title && (d.ingredients.length || d.steps.length)));
   }
 });
+
+test("title case", () => {
+  assert.equal(RB.titleCase("CHICKEN DRY DISH"), "Chicken Dry Dish");
+  assert.equal(RB.titleCase("rogan josh"), "Rogan Josh");
+  assert.equal(RB.titleCase("Urad-moong dal dosa"), "Urad-Moong Dal Dosa");
+  assert.equal(RB.titleCase("RICE WITH PEAS AND  CARROT"), "Rice with Peas and Carrot");
+  assert.equal(RB.titleCase("Aayi's  sweet (2)"), "Aayi's Sweet (2)");
+});

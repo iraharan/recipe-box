@@ -46,7 +46,7 @@
 
   function meta(r) {
     return [r.author && (r.author.startsWith("Aayi") || /book|types of/i.test(r.author) ? r.author : "by " + r.author),
-      total(r) && total(r) + " min", r.servings && "serves " + r.servings, tags(r.cuisine)[0]].filter(Boolean).join(" · ");
+      total(r) && total(r) + " min", r.servings && "serves " + r.servings, tags(r.cuisine)[0] && (RB.titleCase ? RB.titleCase(tags(r.cuisine)[0]) : tags(r.cuisine)[0])].filter(Boolean).join(" · ");
   }
 
   function photoViewer(blob) {
@@ -103,6 +103,7 @@
         chip("Favourites", homeState.fav, () => { homeState.fav = !homeState.fav; drawChips(); draw(); }),
         chip("Quick", homeState.quick, () => { homeState.quick = !homeState.quick; drawChips(); draw(); }),
         meals.map((m) => chip(sentence(m), homeState.meal === m, () => { homeState.meal = homeState.meal === m ? null : m; drawChips(); draw(); })),
+        h("button", { class: "cookbtn", onclick: addSheet }, "Add recipe"), // just above the recipe lists
       );
     }
     drawChips(); draw();
@@ -115,7 +116,6 @@
       h("div", { class: "pad" }, search), chips,
       !all.length ? welcome() : null,
       list,
-      h("button", { class: "fab", onclick: addSheet }, icon("plus"), " Add recipe"),
     );
   }
 
@@ -134,7 +134,7 @@
   function welcome() {
     return h("div", { class: "card pad" },
       h("h3", {}, "Welcome!"),
-      h("p", {}, "Load the family recipe collection, or add your own recipes with the button below."),
+      h("p", {}, "Load the family recipe collection, or add your own recipes with the Add recipe button."),
       h("button", { class: "btn", onclick: familyDialog }, "Load family recipes"));
   }
 
@@ -459,4 +459,5 @@
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
   render();
+  Store.tidyTitles?.().catch(() => {}); // older recipes get the same Title Case; the list refreshes itself
 })();
