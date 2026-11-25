@@ -113,6 +113,12 @@ textarea.big { min-height: 45vh; margin-top: 10px; }
 .chip:hover { background: var(--sage); }
 .chip:active { transform: scale(.96); }
 .chip.on { background: var(--forest); border-color: var(--forest); color: var(--on-forest); }
+/* home: full-width main button + even 3-column filter grid */
+.filtergrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 6px 16px 12px; }
+.filtergrid .chip { height: 44px; padding: 0 2px; font-size: clamp(.82rem, 3.9vw, 1rem); text-align: center; overflow: hidden; text-overflow: ellipsis; }
+.cookbtn { grid-column: 1 / -1; height: 52px; border: 0; border-radius: 26px; cursor: pointer; font: inherit; font-weight: 700; font-size: 1.1rem;
+  color: var(--on-forest); background: var(--forest); box-shadow: var(--shadow); transition: transform .12s ease; }
+.cookbtn:active { transform: scale(.98); }
 .chip.accent { background: var(--sage); border-color: var(--forest); color: var(--forest-deep); font-weight: 700; }
 
 /* lists */

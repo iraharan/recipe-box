@@ -67,8 +67,11 @@
     const all = (await Store.all()).sort((a, b) => b.updatedAt - a.updatedAt);
     const pending = all.filter((r) => r.status !== STATUS.SAVED);
     const saved = all.filter((r) => r.status === STATUS.SAVED);
-    const meals = Object.entries(saved.flatMap((r) => tags(r.meal)).reduce((m, t) => ((m[t] = (m[t] || 0) + 1), m), {}))
-      .sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
+    // Fixed, natural order; up to 7 so that with Favourites and Quick they fill a 3 × 3 grid.
+    const mealOrder = ["breakfast", "lunch", "dinner", "snack", "side", "dessert", "drink"];
+    const used = new Set(saved.flatMap((r) => tags(r.meal)));
+    const meals = [...mealOrder.filter((m) => used.has(m)), ...[...used].filter((m) => !mealOrder.includes(m)).sort()].slice(0, 7);
+    const sentence = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
     const list = h("div", { class: "list" });
     function draw() {
@@ -92,13 +95,14 @@
     }
 
     const chip = (label, on, click) => h("button", { class: "chip" + (on ? " on" : ""), onclick: click }, label);
-    const chips = h("div", { class: "chips" });
+    // The main action on its own full-width button, then the filters in an even 3-column grid.
+    const chips = h("div", { class: "filtergrid" });
     function drawChips() {
-      fill(chips, 
-        h("button", { class: "chip accent", onclick: () => go("#/cook") }, "What can I cook?"),
-        chip("♥ Favourites", homeState.fav, () => { homeState.fav = !homeState.fav; drawChips(); draw(); }),
-        chip("≤ 30 min", homeState.quick, () => { homeState.quick = !homeState.quick; drawChips(); draw(); }),
-        meals.map((m) => chip(m, homeState.meal === m, () => { homeState.meal = homeState.meal === m ? null : m; drawChips(); draw(); })),
+      fill(chips,
+        h("button", { class: "cookbtn", onclick: () => go("#/cook") }, "What can I cook?"),
+        chip("Favourites", homeState.fav, () => { homeState.fav = !homeState.fav; drawChips(); draw(); }),
+        chip("Quick", homeState.quick, () => { homeState.quick = !homeState.quick; drawChips(); draw(); }),
+        meals.map((m) => chip(sentence(m), homeState.meal === m, () => { homeState.meal = homeState.meal === m ? null : m; drawChips(); draw(); })),
       );
     }
     drawChips(); draw();
